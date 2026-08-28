@@ -6,6 +6,7 @@
 Программа получает домен, например `example.com`, генерирует
 похожие варианты с использованием различных техник и проверяет,
 существуют ли эти домены в интернете.
+ <img width="560" height="274" alt="image" src="https://github.com/user-attachments/assets/e203da3f-8c37-44dd-86ff-e6a969eac1ef" />
 
 ## Возможности
 
@@ -23,13 +24,10 @@
 - Экспорт результатов в CSV и JSON.
 - Работа через командную строку.
 
----
-
-# Установка
-
+1.Установка 
 ## Windows
 
-### 1. Установите Python
+Установите Python
 
 Установите Python версии 3.10 или новее.
 
@@ -37,46 +35,54 @@
 
 Проверьте установку:
 
-```powershell
-python --version
-
-или:
-
+```bash
 py --version
-2. Скачайте репозиторий
+```
+
+2.Скачайте репозиторий
 
 Выполните:
 
+```bash
 git clone https://github.com/sadi-m/domain-fuzzer.git
+```
 
 Перейдите в папку проекта:
 
+```bash
 cd domain-fuzzer
+```
 3. Создайте виртуальное окружение
+
+ ```bash
 py -m venv .venv
+```
 4. Активируйте виртуальное окружение
 
-Для PowerShell:
-
+ ```bash
 .venv\Scripts\Activate.ps1
-
+```
 Если используется обычная командная строка:
 
+ ```bash
 .venv\Scripts\activate
+```
 
 После активации в начале строки терминала должно появиться:
 
+ ```bash
 (.venv)
+```
+
 5. Установите необходимые библиотеки
-
 Выполните:
-
+ ```bash
 python -m pip install --upgrade pip
-
+```
 Затем:
-
+ ```bash
 pip install -r requirements.txt
-
+```
 Дождитесь окончания установки.
 
 Запуск
@@ -84,171 +90,52 @@ pip install -r requirements.txt
 
 Запустите:
 
+ ```bash
 python main.py
-
+```
 Программа попросит ввести домен.
 
 Например:
 
+ ```bash
 example.com
-Запуск с доменом сразу
+```
 
-Можно сразу указать домен:
-
-python main.py example.com
-Быстрый запуск
-
-Чтобы ускорить проверку и не выполнять WHOIS-запросы:
-
-python main.py example.com --no-whois --threads 40
-Сохранение результатов
-CSV
-python main.py example.com --output results.csv
-JSON
-python main.py example.com --output results.json
-Основные параметры
-Параметр	Описание
-domain	Домен для анализа
--o, --output FILE	Сохранение результатов в CSV или JSON
--t, --threads N	Количество параллельных потоков
---timeout SECONDS	Тайм-аут сетевого запроса
---no-whois	Не выполнять WHOIS-запросы
---no-progress	Отключить индикатор прогресса
---model PATH	Использовать другой файл homoglyph-модели
--q, --quiet	Отключить информационный баннер
--v, --verbose	Включить подробное журналирование
-
-По умолчанию используется:
-
-Потоки: 20
-Тайм-аут: 5 секунд
-Используемые техники
-
-Программа генерирует варианты домена несколькими способами.
-
-CA — добавление символа
-
-Добавляются дополнительные символы в домен.
-
-CD — удаление символа
-
-Один из символов домена удаляется.
-
-CR — замена символа
-
-Один символ заменяется другим.
-
-HM — homoglyph
-
-Используются визуально похожие Unicode-символы.
-
-HP — дефис
-
-Создаются варианты с использованием дефисов.
-
-Структура проекта
-domain-fuzzer/
-│
-├── main.py
-├── requirements.txt
-├── README.md
-│
-├── core/
-│   ├── __init__.py
-│   │
-│   └── services/
-│       ├── __init__.py
-│       ├── fuzzer.py
-│       ├── network.py
-│       ├── whois_query.py
-│       ├── parser.py
-│       ├── input.py
-│       └── export.py
-│
-└── data/
-    └── homoglyph/
-        └── model.json
-Назначение файлов
-
-main.py — запуск программы и обработка команд.
-
-fuzzer.py — генерация вариантов домена и организация сканирования.
-
-network.py — DNS- и HTTP-проверки.
-
-whois_query.py — получение WHOIS-информации.
-
-parser.py — обработка и проверка введённого домена.
-
-input.py — интерактивный ввод.
-
-export.py — сохранение результатов.
-
-model.json — база визуально похожих символов.
-
-GitHub Codespaces
-
-Проект можно запускать непосредственно в GitHub Codespaces,
-без установки Python на компьютере.
-
-На странице репозитория:
-
-Code
-→ Codespaces
-→ Create codespace on main
-
-После создания Codespace откройте терминал.
-
-Установите зависимости:
-
-pip install -r requirements.txt
-
-Запустите программу:
-
-python main.py example.com
-Linux / Kali Linux
+## Linux / Kali Linux
 
 Клонируйте репозиторий:
 
+ ```bash
 git clone https://github.com/sadi-m/domain-fuzzer.git
-
+```
 Перейдите в проект:
 
+ ```bash
 cd domain-fuzzer
-
+```
 Создайте виртуальное окружение:
 
+ ```bash
 python3 -m venv .venv
-
+```
 Активируйте его:
 
+ ```bash
 source .venv/bin/activate
-
+```
 Установите зависимости:
-
+ 
+ ```bash
 pip install -r requirements.txt
+```
 
 Запустите:
 
+ ```bash
 python main.py example.com
-Пример
+```
 
-Проверка домена:
-
-python main.py example.com
-
-Быстрая проверка:
-
-python main.py example.com --no-whois
-
-Более быстрое многопоточное сканирование:
-
-python main.py example.com --no-whois --threads 40
-
-Сохранение результатов:
-
-python main.py example.com --output results.json
-Назначение проекта
+## Назначение проекта
 
 Проект предназначен прежде всего для защитного анализа доменов.
 
