@@ -28,9 +28,9 @@
 ## Windows
 
 Установите Python
-```bash
+
 https://www.python.org/downloads/
-```
+
 Установите Python версии 3.10 или новее.
 
 После установки откройте PowerShell или командную строку.
