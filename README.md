@@ -1,120 +1,267 @@
-# domain-fuzzer
+# Domain Fuzzer
 
-Advanced domain-based phishing and impersonating-domain detection tool.
+Инструмент для обнаружения потенциально опасных доменов,
+которые могут использоваться для имитации или подмены настоящего домена.
 
-Given a domain (e.g. `example.com`), it generates realistic typosquatting and
-homoglyph variations (character insertion, deletion, substitution, homoglyph
-swaps, hyphenation), then checks which of those variations are actually
-registered/live — via HTTP and DNS — and tries to find an abuse-reporting
-contact via WHOIS, so you can spot and report domains impersonating you.
+Программа получает домен, например `example.com`, генерирует
+похожие варианты с использованием различных техник и проверяет,
+существуют ли эти домены в интернете.
 
-## What changed from the original version
+## Возможности
 
-- **Fixed dead/duplicated code**: `network.py` and `whois_query.py` had
-  free functions that took a stray, unused `self` argument and were never
-  actually called — `fuzzer.py` had its own copy-pasted versions instead.
-  The scanner now properly composes the split-out `network` and
-  `whois_query` modules.
-- **Concurrency**: the original scanned every variation (often 300+ for a
-  single domain) one at a time — HTTP request, then DNS lookup, then a WHOIS
-  query, sequentially. That's minutes of dead time. Scanning is now
-  parallelized with a thread pool (`--threads`, default 20).
-- **Deduplication**: character-insertion/substitution can regenerate the same
-  string via different techniques; variations are now deduplicated and the
-  original domain itself is excluded from results.
-- **CLI**: `main.py` now takes the domain as an argument (falls back to the
-  interactive prompt if omitted), plus flags for threads, timeout, skipping
-  WHOIS, disabling the progress bar, and choosing a different homoglyph
-  model file.
-- **Export**: `--output results.csv` / `--output results.json` writes the
-  full result set out, not just what's printed to the terminal.
-- **Input validation**: `parser.py` now accepts bare domains or full URLs,
-  strips ports/credentials, and rejects garbage input before wasting time
-  fuzzing it.
-- **Fixed `requirements.txt`**: it listed `whois`, which is a *different*,
-  unrelated PyPI package from the one the code actually imports
-  (`whois.whois(...)` with `.status`/`.emails` is the API of `python-whois`).
-  Also added `python-Levenshtein` so `fuzzywuzzy` doesn't fall back to a slow
-  pure-Python matcher.
-- **Better error handling**: WHOIS/DNS/HTTP failures are caught per-technique
-  instead of raising through the whole scan; a missing/invalid homoglyph
-  model or empty input now fails with a clear message instead of a traceback.
-- **Results sorted by similarity** (most dangerous look-alikes first) with
-  a stable `#` index, instead of raw generation order.
-- **Proper package layout** with `__init__.py` files, matching what `main.py`
-  already expected (`core.services.fuzzer`, etc.).
+- Генерация похожих доменов.
+- Добавление символов.
+- Удаление символов.
+- Замена символов.
+- Использование визуально похожих Unicode-символов (homoglyph).
+- Добавление дефисов.
+- Проверка DNS.
+- Проверка доступности через HTTP.
+- Получение информации WHOIS.
+- Параллельное сканирование нескольких доменов.
+- Сортировка результатов по степени похожести.
+- Экспорт результатов в CSV и JSON.
+- Работа через командную строку.
 
-## Install
+---
 
-```bash
+# Установка
+
+## Windows
+
+### 1. Установите Python
+
+Установите Python версии 3.10 или новее.
+
+После установки откройте PowerShell или командную строку.
+
+Проверьте установку:
+
+```powershell
+python --version
+
+или:
+
+py --version
+2. Скачайте репозиторий
+
+Выполните:
+
+git clone https://github.com/sadi-m/domain-fuzzer.git
+
+Перейдите в папку проекта:
+
+cd domain-fuzzer
+3. Создайте виртуальное окружение
+py -m venv .venv
+4. Активируйте виртуальное окружение
+
+Для PowerShell:
+
+.venv\Scripts\Activate.ps1
+
+Если используется обычная командная строка:
+
+.venv\Scripts\activate
+
+После активации в начале строки терминала должно появиться:
+
+(.venv)
+5. Установите необходимые библиотеки
+
+Выполните:
+
+python -m pip install --upgrade pip
+
+Затем:
+
 pip install -r requirements.txt
-```
 
-## Usage
+Дождитесь окончания установки.
 
-```bash
-# Interactive (prompts for a domain)
+Запуск
+Интерактивный режим
+
+Запустите:
+
 python main.py
 
-# Non-interactive
+Программа попросит ввести домен.
+
+Например:
+
+example.com
+Запуск с доменом сразу
+
+Можно сразу указать домен:
+
+python main.py example.com
+Быстрый запуск
+
+Чтобы ускорить проверку и не выполнять WHOIS-запросы:
+
+python main.py example.com --no-whois --threads 40
+Сохранение результатов
+CSV
+python main.py example.com --output results.csv
+JSON
+python main.py example.com --output results.json
+Основные параметры
+Параметр	Описание
+domain	Домен для анализа
+-o, --output FILE	Сохранение результатов в CSV или JSON
+-t, --threads N	Количество параллельных потоков
+--timeout SECONDS	Тайм-аут сетевого запроса
+--no-whois	Не выполнять WHOIS-запросы
+--no-progress	Отключить индикатор прогресса
+--model PATH	Использовать другой файл homoglyph-модели
+-q, --quiet	Отключить информационный баннер
+-v, --verbose	Включить подробное журналирование
+
+По умолчанию используется:
+
+Потоки: 20
+Тайм-аут: 5 секунд
+Используемые техники
+
+Программа генерирует варианты домена несколькими способами.
+
+CA — добавление символа
+
+Добавляются дополнительные символы в домен.
+
+CD — удаление символа
+
+Один из символов домена удаляется.
+
+CR — замена символа
+
+Один символ заменяется другим.
+
+HM — homoglyph
+
+Используются визуально похожие Unicode-символы.
+
+HP — дефис
+
+Создаются варианты с использованием дефисов.
+
+Структура проекта
+domain-fuzzer/
+│
+├── main.py
+├── requirements.txt
+├── README.md
+│
+├── core/
+│   ├── __init__.py
+│   │
+│   └── services/
+│       ├── __init__.py
+│       ├── fuzzer.py
+│       ├── network.py
+│       ├── whois_query.py
+│       ├── parser.py
+│       ├── input.py
+│       └── export.py
+│
+└── data/
+    └── homoglyph/
+        └── model.json
+Назначение файлов
+
+main.py — запуск программы и обработка команд.
+
+fuzzer.py — генерация вариантов домена и организация сканирования.
+
+network.py — DNS- и HTTP-проверки.
+
+whois_query.py — получение WHOIS-информации.
+
+parser.py — обработка и проверка введённого домена.
+
+input.py — интерактивный ввод.
+
+export.py — сохранение результатов.
+
+model.json — база визуально похожих символов.
+
+GitHub Codespaces
+
+Проект можно запускать непосредственно в GitHub Codespaces,
+без установки Python на компьютере.
+
+На странице репозитория:
+
+Code
+→ Codespaces
+→ Create codespace on main
+
+После создания Codespace откройте терминал.
+
+Установите зависимости:
+
+pip install -r requirements.txt
+
+Запустите программу:
+
+python main.py example.com
+Linux / Kali Linux
+
+Клонируйте репозиторий:
+
+git clone https://github.com/sadi-m/domain-fuzzer.git
+
+Перейдите в проект:
+
+cd domain-fuzzer
+
+Создайте виртуальное окружение:
+
+python3 -m venv .venv
+
+Активируйте его:
+
+source .venv/bin/activate
+
+Установите зависимости:
+
+pip install -r requirements.txt
+
+Запустите:
+
+python main.py example.com
+Пример
+
+Проверка домена:
+
 python main.py example.com
 
-# Faster scan, skip WHOIS (WHOIS servers are often rate-limited/slow)
+Быстрая проверка:
+
+python main.py example.com --no-whois
+
+Более быстрое многопоточное сканирование:
+
 python main.py example.com --no-whois --threads 40
 
-# Save full results
-python main.py example.com --output results.csv
+Сохранение результатов:
+
 python main.py example.com --output results.json
-```
+Назначение проекта
 
-### Options
+Проект предназначен прежде всего для защитного анализа доменов.
 
-| Flag | Description |
-|---|---|
-| `domain` | Domain to analyze (optional; prompts if omitted) |
-| `-o, --output FILE` | Write results to CSV or JSON (by extension) |
-| `-t, --threads N` | Concurrent workers for HTTP/DNS/WHOIS (default: 20) |
-| `--timeout SECONDS` | Per-request network timeout (default: 5) |
-| `--no-whois` | Skip WHOIS abuse-contact lookups |
-| `--no-progress` | Disable the progress bar |
-| `--model PATH` | Path to a custom homoglyph model JSON |
-| `-q, --quiet` | Suppress the startup banner |
-| `-v, --verbose` | Debug logging |
+Он может использоваться для поиска доменов, похожих на домен
+организации, бренда или собственного проекта.
 
-## Techniques
+Например, организация может проверить свой домен и обнаружить
+зарегистрированные домены, которые визуально или написанием
+похожи на настоящий.
 
-| Code | Technique |
-|---|---|
-| `CA` | Character addition |
-| `CD` | Character deletion |
-| `CR` | Character replacement |
-| `HM` | Homoglyph substitution (visually similar Unicode characters) |
-| `HP` | Hyphenation |
+Такие результаты могут использоваться для дальнейшего анализа
+и подготовки жалоб на подозрительные домены.
 
-## Project layout
-
-```
-main.py
-core/
-  services/
-    fuzzer.py       # variation generation + concurrent scan orchestration
-    network.py       # HTTP availability + DNS resolution
-    whois_query.py   # WHOIS abuse-contact lookup
-    parser.py         # domain parsing/validation
-    input.py           # interactive prompt
-    export.py         # CSV/JSON export
-data/
-  homoglyph/
-    model.json        # character -> visually-similar-character map
-```
-
-## Notes
-
-- This tool is intended for **defensive** use: monitoring for domains that
-  impersonate your own brand/organization so they can be reported and taken
-  down. Be mindful of target sites' terms of service and rate limits — the
-  default 20 threads is a reasonable balance, but consider lowering it for
-  large-scale scans.
-- WHOIS lookups are the slowest and most rate-limit-prone step; use
-  `--no-whois` for a quick availability sweep and re-run WHOIS only on the
-  interesting hits if needed.
+При использовании программы необходимо учитывать ограничения
+сетевых сервисов, правила WHOIS-серверов и условия использования
+проверяемых ресурсов.
