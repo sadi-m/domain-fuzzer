@@ -1,0 +1,7 @@
+requests>=2.31
+dnspython>=2.4
+tqdm>=4.66
+fuzzywuzzy>=0.18
+python-Levenshtein>=0.21
+tabulate>=0.9
+python-whois>=0.9
