@@ -29,7 +29,7 @@
 
 Установите Python
 ```bash
-[py --version](https://www.python.org/downloads/)
+https://www.python.org/downloads/
 ```
 Установите Python версии 3.10 или новее.
 
